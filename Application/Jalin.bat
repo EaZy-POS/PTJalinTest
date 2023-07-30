@@ -1,0 +1,1 @@
+java -cp *;lib/* id.co.lutfi.ptjalintestapplication.Main --gui

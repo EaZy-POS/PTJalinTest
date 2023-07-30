@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app>
+    <servlet>
+        <servlet-name>jalin</servlet-name>
+        <servlet-class>com.jalin.apitest.ApitestApplication</servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+</web-app>
