@@ -21,11 +21,11 @@ import org.testcontainers.shaded.okhttp3.Response;
  */
 public class Tester extends javax.swing.JFrame {
 
-    private static boolean isStart = true;
     private static String inquiry_request_holder;
     private static String inquiry_response_holder;
     private static String payment_request_holder;
     private static String payment_response_holder;
+    private static ConfigUrl config;
     private static int request_state = 0;
     
     /**
@@ -40,18 +40,20 @@ public class Tester extends javax.swing.JFrame {
     }
 
     private void initStart() {
-        if (isStart) {
-            txt_url.setText("http://127.0.0.1:8080");
-            txt_path.setText("/api/inquiry");
-        }
-        
         txt_request.setText("");
         txt_response.setText("");
         setTransactionType();
         setLocationRelativeTo(this);
-        isStart = false;
         holdRequest("");
         holdResponse("");
+        cekConfig();
+    }
+    
+    private void cekConfig(){
+        if(config == null){
+            config_dialog.setLocationRelativeTo(this);
+            config_dialog.setVisible(true);
+        }
     }
 
     private void setTransactionType() {
@@ -66,11 +68,8 @@ public class Tester extends javax.swing.JFrame {
     }
 
     private void performButonKirim() {
-        if (txt_url.getText().equals("") || !txt_url.getText().startsWith("http")) {
-            showMessage("Mohon isi url dengan benar!", JOptionPane.WARNING_MESSAGE);
-        } else if (txt_path.getText().equals("")) {
-            showMessage("Mohon isi path dengan benar!", JOptionPane.WARNING_MESSAGE);
-        } else if (cmb_trx_type.getSelectedIndex() == 0) {
+        cekConfig();
+        if (cmb_trx_type.getSelectedIndex() == 0) {
             showMessage("Mohon pilih transaksi!", JOptionPane.WARNING_MESSAGE);
         } else if (txt_request.getText().equals("")) {
             showMessage("Mohon isi request!", JOptionPane.WARNING_MESSAGE);
@@ -108,6 +107,8 @@ public class Tester extends javax.swing.JFrame {
                 payment_request_holder = msg;
                 break;
             default:
+                inquiry_request_holder = msg;
+                payment_request_holder = msg;
                 break;
         }
     }
@@ -121,6 +122,8 @@ public class Tester extends javax.swing.JFrame {
                 payment_response_holder = msg;
                 break;
             default:
+                inquiry_response_holder = msg;
+                payment_response_holder = msg;
                 break;
         }
     }
@@ -142,7 +145,7 @@ public class Tester extends javax.swing.JFrame {
     private String sendHttpPOSTRequest(String pParam) {
         OkHttpClient tCon;
         String tResponse = "";
-        String tBaseUrl = txt_url.getText().concat(txt_path.getText());
+        String tBaseUrl = config.getUrl(request_state);
 
         int timeout = 30000;
         try {
@@ -176,6 +179,23 @@ public class Tester extends javax.swing.JFrame {
                 break;
         }
     }
+    
+    private void saveConfig(){
+        if(txt_baseurl.getText().equals("") || !txt_baseurl.getText().startsWith("http")){
+            showMessage("Mohon isi base url dengan benar", JOptionPane.WARNING_MESSAGE);
+        }else if(txt_inquiry_path.getText().equals("")){
+            showMessage("Mohon path inquiry dengan benar", JOptionPane.WARNING_MESSAGE);
+        }else if(txt_payment_path.getText().equals("")){
+            showMessage("Mohon path payment dengan benar", JOptionPane.WARNING_MESSAGE);
+        }else{
+            config = new ConfigUrl();
+            config.setBaseUrl(txt_baseurl.getText());
+            config.setInquiryPath(txt_inquiry_path.getText());
+            config.setPaymentPath(txt_payment_path.getText());
+            config_dialog.dispose();
+        }
+        
+    }
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -186,11 +206,16 @@ public class Tester extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jPanel1 = new javax.swing.JPanel();
-        jLabel1 = new javax.swing.JLabel();
-        txt_url = new javax.swing.JTextField();
-        jLabel2 = new javax.swing.JLabel();
-        txt_path = new javax.swing.JTextField();
+        config_dialog = new javax.swing.JDialog();
+        jPanel6 = new javax.swing.JPanel();
+        txt_baseurl = new javax.swing.JTextField();
+        jLabel3 = new javax.swing.JLabel();
+        jLabel4 = new javax.swing.JLabel();
+        jLabel5 = new javax.swing.JLabel();
+        txt_inquiry_path = new javax.swing.JTextField();
+        txt_payment_path = new javax.swing.JTextField();
+        jPanel7 = new javax.swing.JPanel();
+        btn_simpan = new javax.swing.JButton();
         jPanel2 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         txt_request = new javax.swing.JTextArea();
@@ -203,6 +228,99 @@ public class Tester extends javax.swing.JFrame {
         jScrollPane2 = new javax.swing.JScrollPane();
         txt_response = new javax.swing.JTextArea();
 
+        config_dialog.setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        config_dialog.setTitle("Config");
+        config_dialog.setBounds(new java.awt.Rectangle(0, 0, 450, 200));
+        config_dialog.setModalityType(java.awt.Dialog.ModalityType.APPLICATION_MODAL);
+        config_dialog.setResizable(false);
+        config_dialog.addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosed(java.awt.event.WindowEvent evt) {
+                config_dialogWindowClosed(evt);
+            }
+        });
+
+        jPanel6.setBorder(javax.swing.BorderFactory.createTitledBorder("Config URL"));
+
+        jLabel3.setText("Base URL");
+
+        jLabel4.setText("Inquiry Path");
+
+        jLabel5.setText("Payment Path");
+
+        javax.swing.GroupLayout jPanel6Layout = new javax.swing.GroupLayout(jPanel6);
+        jPanel6.setLayout(jPanel6Layout);
+        jPanel6Layout.setHorizontalGroup(
+            jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel6Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel5, javax.swing.GroupLayout.DEFAULT_SIZE, 116, Short.MAX_VALUE)
+                    .addComponent(jLabel4, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jLabel3, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(txt_baseurl, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 267, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txt_inquiry_path, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 267, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txt_payment_path, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 267, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap())
+        );
+        jPanel6Layout.setVerticalGroup(
+            jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel6Layout.createSequentialGroup()
+                .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(txt_baseurl, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel3))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel4)
+                    .addComponent(txt_inquiry_path, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
+                .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel5)
+                    .addComponent(txt_payment_path, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+        );
+
+        jPanel7.setBorder(javax.swing.BorderFactory.createTitledBorder(""));
+
+        btn_simpan.setText("Simpan");
+        btn_simpan.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btn_simpanActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanel7Layout = new javax.swing.GroupLayout(jPanel7);
+        jPanel7.setLayout(jPanel7Layout);
+        jPanel7Layout.setHorizontalGroup(
+            jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel7Layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(btn_simpan)
+                .addContainerGap())
+        );
+        jPanel7Layout.setVerticalGroup(
+            jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel7Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(btn_simpan)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        javax.swing.GroupLayout config_dialogLayout = new javax.swing.GroupLayout(config_dialog.getContentPane());
+        config_dialog.getContentPane().setLayout(config_dialogLayout);
+        config_dialogLayout.setHorizontalGroup(
+            config_dialogLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jPanel6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jPanel7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        );
+        config_dialogLayout.setVerticalGroup(
+            config_dialogLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(config_dialogLayout.createSequentialGroup()
+                .addComponent(jPanel6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jPanel7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+        );
+
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         addComponentListener(new java.awt.event.ComponentAdapter() {
             public void componentShown(java.awt.event.ComponentEvent evt) {
@@ -214,45 +332,6 @@ public class Tester extends javax.swing.JFrame {
                 formWindowClosed(evt);
             }
         });
-
-        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("End Point"));
-
-        jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
-        jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-        jLabel1.setText("url");
-        jLabel1.setVerticalAlignment(javax.swing.SwingConstants.BOTTOM);
-
-        jLabel2.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
-        jLabel2.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-        jLabel2.setText("Path");
-        jLabel2.setVerticalAlignment(javax.swing.SwingConstants.BOTTOM);
-
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(txt_url, javax.swing.GroupLayout.PREFERRED_SIZE, 330, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jLabel2)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(txt_path, javax.swing.GroupLayout.DEFAULT_SIZE, 423, Short.MAX_VALUE)
-                .addContainerGap())
-        );
-        jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel1)
-                    .addComponent(txt_url, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel2)
-                    .addComponent(txt_path, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(12, Short.MAX_VALUE))
-        );
 
         jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Request"));
 
@@ -308,7 +387,7 @@ public class Tester extends javax.swing.JFrame {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
                 .addComponent(jPanel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 447, Short.MAX_VALUE)
+                .addComponent(jScrollPane1)
                 .addContainerGap())
         );
 
@@ -363,7 +442,7 @@ public class Tester extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jScrollPane2))
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 439, Short.MAX_VALUE))
                 .addContainerGap())
         );
         jPanel3Layout.setVerticalGroup(
@@ -371,7 +450,7 @@ public class Tester extends javax.swing.JFrame {
             .addGroup(jPanel3Layout.createSequentialGroup()
                 .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane2)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 510, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -379,7 +458,6 @@ public class Tester extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -390,11 +468,10 @@ public class Tester extends javax.swing.JFrame {
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
 
@@ -423,12 +500,6 @@ public class Tester extends javax.swing.JFrame {
     private void cmb_trx_typeItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_cmb_trx_typeItemStateChanged
         // TODO add your handling code here:
         request_state = cmb_trx_type.getSelectedIndex();
-        if(cmb_trx_type.getSelectedIndex() == 2){
-            txt_path.setText("/api/payment");
-        }
-        if(cmb_trx_type.getSelectedIndex() == 1){
-            txt_path.setText("/api/inquiry");
-        }
         loadMessageHolder();
     }//GEN-LAST:event_cmb_trx_typeItemStateChanged
 
@@ -436,6 +507,15 @@ public class Tester extends javax.swing.JFrame {
         // TODO add your handling code here:
         System.exit(1);
     }//GEN-LAST:event_formWindowClosed
+
+    private void btn_simpanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_simpanActionPerformed
+        // TODO add your handling code here:
+        saveConfig();
+    }//GEN-LAST:event_btn_simpanActionPerformed
+
+    private void config_dialogWindowClosed(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_config_dialogWindowClosed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_config_dialogWindowClosed
 
     /**
      * @param args the command line arguments
@@ -470,19 +550,24 @@ public class Tester extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btn_batal;
     private javax.swing.JButton btn_kirim;
+    private javax.swing.JButton btn_simpan;
     private javax.swing.JComboBox<String> cmb_trx_type;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JPanel jPanel1;
+    private javax.swing.JDialog config_dialog;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
+    private javax.swing.JPanel jPanel6;
+    private javax.swing.JPanel jPanel7;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JTextField txt_path;
+    private javax.swing.JTextField txt_baseurl;
+    private javax.swing.JTextField txt_inquiry_path;
+    private javax.swing.JTextField txt_payment_path;
     private javax.swing.JTextArea txt_request;
     private javax.swing.JTextArea txt_response;
-    private javax.swing.JTextField txt_url;
     // End of variables declaration//GEN-END:variables
 }
