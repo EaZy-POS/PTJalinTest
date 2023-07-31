@@ -49,11 +49,13 @@ public class Tester extends javax.swing.JFrame {
         cekConfig();
     }
     
-    private void cekConfig(){
+    private boolean cekConfig(){
         if(config == null){
             config_dialog.setLocationRelativeTo(this);
             config_dialog.setVisible(true);
         }
+        
+        return config != null;
     }
 
     private void setTransactionType() {
@@ -68,7 +70,6 @@ public class Tester extends javax.swing.JFrame {
     }
 
     private void performButonKirim() {
-        cekConfig();
         if (cmb_trx_type.getSelectedIndex() == 0) {
             showMessage("Mohon pilih transaksi!", JOptionPane.WARNING_MESSAGE);
         } else if (txt_request.getText().equals("")) {
@@ -129,16 +130,17 @@ public class Tester extends javax.swing.JFrame {
     }
 
     private void sendRequest(String pRequest) {
-        
-        holdRequest(pRequest);
-        String tResponse = sendHttpPOSTRequest(pRequest);
-        
-        if(tResponse != null && !tResponse.equals("")){
-            JSONObject tJsonResp = new JSONObject(tResponse);
-            holdResponse(tJsonResp.toString(1));
-            txt_response.setText(tJsonResp.toString(1));
-        }else{
-            txt_response.append("--> Error Response from server ...................... \n");
+        if (cekConfig()) {
+            holdRequest(pRequest);
+            String tResponse = sendHttpPOSTRequest(pRequest);
+
+            if (tResponse != null && !tResponse.equals("")) {
+                JSONObject tJsonResp = new JSONObject(tResponse);
+                holdResponse(tJsonResp.toString(1));
+                txt_response.setText(tJsonResp.toString(1));
+            } else {
+                txt_response.append("--> Error Response from server ...................... \n");
+            }
         }
     }
 
